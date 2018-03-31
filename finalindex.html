@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- adding moment.js -->
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+
+    <link rel="stylesheet" href="style.css">
+
+
+    <title>Time Tracker</title>
+</head>
+<!-- the jumbo intro -->
+
+<body>
+    <div class="jumbotron">
+        <div class="jumbo">
+            <h1 class="display-4">Better than NJ transit train schedule</h1>
+            <h4 class="lead">Don't miss your train, see what time they show up</h4>
+        </div>
+    </div>
+    <!-- the first train schedule container -->
+    <div class="container">
+        <div class="col-md-auto">
+            <table class="table" id="tableinput">
+                <thead>
+                    <tr>
+                        <div class="FullList">
+                            <th scope="col">Train Name</th>
+                            <th scope="col">Destination</th>
+                            <th scope="col">Frequency (min)</th>
+                            <th scope="col">Next Arrival</th>
+                            <th scope="col">Minutes away</th>
+                        </div>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <!-- <th scope="row">1</th> -->
+                        <td id="train-name">test</td>
+                        <td id="destination">test</td>
+                        <td id="frequency">@mdo</td>
+                        <td id="next-arrival">@mdo</td>
+                        <td id="minutes-away">@mdo</td>
+                    </tr>
+
+                    <!-- code needed to make the js keep adding to the above id's. -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- second container to add the train -->
+    <div class="container">
+        <div class="col-md-auto">
+            <div class="intro-line">
+                <h3>Add Train</h3>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label for="trainNameInput">Train Name</label>
+                    <input type="text" class="form-control" id="trainNameInput" aria-describedby="emailHelp">
+                </div>
+
+                <div class="form-group">
+                    <label for="destinationInput">Destination</label>
+                    <input type="text" class="form-control" id="destinationInput" placeholder="Job role">
+                </div>
+
+
+                <div class="form-group">
+                    <label for="trainTimeInput">First Train Time (HH:MM - military time)</label>
+                    <input type="text" class="form-control" id="trainTimeInput">
+                </div>
+
+
+                <div class="form-group">
+                    <label for="frequencyInput">Frequency (min)</label>
+                    <input type="text" class="form-control" id="frequencyInput">
+                </div>
+
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-form">Submit</button>
+        </form>
+    </div>
+    </div>
+
+
+    <!-- <script src="https://code.jquery.com/jquery.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+
+    <script>
+        var config = {
+            apiKey: "AIzaSyAt7uWNuS7WWFH4v14WwKe9fxhXVAKPjsg",
+            authDomain: "fir-learning-9c20a.firebaseapp.com",
+            databaseURL: "https://fir-learning-9c20a.firebaseio.com",
+            projectId: "fir-learning-9c20a",
+            storageBucket: "fir-learning-9c20a.appspot.com",
+            messagingSenderId: "919972190992"
+        };
+        firebase.initializeApp(config);
+
+
+
+        //create a reference to the database part of the website.  not storage or anything else. 
+        var database = firebase.database();
+
+        //capture the button click from the user and prevent the default reload of the page.
+        $("#submit-form").on("click", function (event) {
+            event.preventDefault();
+
+            // //the initial value and what needs to get filled
+            var trainName = "";
+            var destination = "";
+            var traintime = "";
+            var frequency = "";
+
+
+            //take the values from the text boxes to put into this function on click.
+            var trainName = $("#trainNameInput").val().trim();
+            var destination = $("#destinationInput").val().trim();
+            var traintime = $("#trainTimeInput").val().trim();
+            var frequency = $("#frequencyInput").val().trim();
+
+            console.log([trainName, destination, traintime, frequency]);
+
+            //get number of months from start date. below are the ones that need the info calculated for us.
+            // var totalMonths = moment().diff(moment(startDate), "months");
+            // var totalBilled = parseInt(MonthlyRate) * parseInt(rate);
+
+
+            //pushing the data up to firebox.  ASK ABOUT THIS PART.
+            database.ref().push({
+                trainName: trainName,
+                destination: destination,
+                traintime: traintime,
+                frequency: frequency,
+
+                //dateAdded is from firebox, its a pre set thing it does. 
+                dateAdded: firebase.database.ServerValue.TIMESTAMP
+
+            });
+
+            //treat child added as its 1 thing at a time, not a loop.  returns one at a time, but multiple times. the callback function only needs to be done for 1 child, and the rest will do it. 
+
+            // database.ref().orderByChild("dateAdded").on("child_added", function (snapshot) {
+            //     var sb = snapshot.val();
+            //     console.log(sb);
+            //     // Console.log(sb.startDate);
+            //     // console.log(sb.monthsWorked);
+            //     // console.log(sb.monthlyRate);
+            //     // console.log(sb.totalBilled);
+            //     // console.log(snapshot);
+            // });
+
+
+            database.ref().on("child_added", function (snapshot) {
+
+                // Log everything that's coming out of snapshot
+                console.log(snapshot.val())
+
+
+                //create the reference to create a table based on the table role. for each piece of data.
+                var tr = $("<tr>");
+                var tdName = $("<td>").text(trainName);
+                var tddestination = $("<td>").text(destination);
+                var tdtraintime = $("<td>").text(traintime);
+                var tdfrequency = $("<td>").text(frequency);
+
+                //add in the appen do fht einfo like an array. add in all form areas. tables have to have matching table accounts.  leave areas blank if you need to. 
+                tr.append(tdName, tddestination, traintime, frequency);
+
+                $("#tableinput").find('tbody').append(tr);
+                //playing with time.. not for this excerise above.
+
+
+                ///adding in the date for the employee list. 
+                var randomDate = "start-data";
+                console.log(moment(randomDate).format("dddd, MMMM Do YYYY, h:mm:ss a"))
+
+
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

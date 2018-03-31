@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>Moment JS Exercises</title>
+
+</head>
+
+<body>
+
+        <div class="container">
+                <div class="col-md-auto">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <div class="FullList">
+                                    <th scope="col">Train Name</th>
+                                    <th scope="col">Destination</th>
+                                    <th scope="col">Frequency (min)</th>
+                                    <th scope="col">Next Arrival</th>
+                                    <th scope="col">Minutes away</th>
+                                </div>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <!-- <th scope="row">1</th> -->
+                                <td id="train-name">test</td>
+                                <td id="destination">test</td>
+                                <td id="frequency">@mdo</td>
+                                <td id="next-arrival">@mdo</td>
+                                <td id="minutes-away">@mdo</td>
+                            </tr>
+        
+                            <!-- code needed to make the js keep adding to the above id's. -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery.js"></script>
+
+  <!-- Link to Moment.js should go here -->
+  <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+
+  <script>
+    var randomDate = "02/23/1999";
+
+    // Using scripts from moment.js write code below to complete each of the following.
+    // Console.log to confirm the code changes we made worked.
+    console.log(moment(randomDate));
+    // 1 ...to convert the randomDate into three other date formats
+    console.log(moment(randomDate).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+    console.log(moment(randomDate).format("X"));
+    console.log(moment(randomDate).format("DDDo") + " Day Of The Year")
+    // 2 ...to determine the time in years, months, days between today and the randomDate
+    console.log(moment().diff(moment(randomDate), "years"))
+    console.log(moment().diff(moment(randomDate), "months"))
+    console.log(moment().diff(moment(randomDate), "days"))
+    // 3 ...to determine the number of days between the randomDate and 02/14/2001
+    console.log(moment("02/14/2001").diff(moment(randomDate), "days"))
+
+    // 4 ...to convert the randomDate to unix time (be sure to look up what unix time even is!!!)
+    // 5 ...to determine what day of the week and what week of the year this randomDate falls on.
+
+    // If you finish early...
+    // Start creating HTML inputs and then redisplay the dates using moment.js elsewhere on the page.
+  </script>
+
+</body>
+
+</html>
