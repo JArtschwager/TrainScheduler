@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <!-- adding moment.js -->
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
-
-
     <link rel="stylesheet" href="style.css">
 
 
@@ -40,8 +38,7 @@
                     </tr>
                 </thead>
                 <tbody>
-
-                    <!-- code needed to make the js keep adding to the above id's. -->
+                    <!-- data goes here -->
                 </tbody>
             </table>
         </div>
@@ -62,7 +59,7 @@
 
                 <div class="form-group">
                     <label for="destinationInput">Destination</label>
-                    <input type="text" class="form-control" id="destinationInput" placeholder="Job role">
+                    <input type="text" class="form-control" id="destinationInput">
                 </div>
 
 
@@ -82,14 +79,12 @@
         </form>
     </div>
     </div>
-
-
-    <!-- <script src="https://code.jquery.com/jquery.js"></script> -->
+<!-- scripts on top -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
 
-
+<!-- input the firebase -->
     <script>
         var config = {
             apiKey: "AIzaSyAt7uWNuS7WWFH4v14WwKe9fxhXVAKPjsg",
@@ -102,11 +97,11 @@
         firebase.initializeApp(config);
 
 
-
         //create a reference to the database part of the website.  not storage or anything else. 
         var database = firebase.database();
-
+        //load firebase info into the table
         database.ref().on('value', function(snapshot) {
+            $("#tableinput").find('tbody').empty();
             snapshot.forEach(function(childSnapshot) {
                 createRow(childSnapshot);
             });
@@ -116,13 +111,6 @@
         $("#submit-form").on("click", function (event) {
             event.preventDefault();
 
-            // //the initial value and what needs to get filled
-            var trainName = "";
-            var destination = "";
-            var traintime = "";
-            var frequency = "";
-
-
             //take the values from the text boxes to put into this function on click.
             var trainName = $("#trainNameInput").val().trim();
             var destination = $("#destinationInput").val().trim();
@@ -131,70 +119,44 @@
 
             //console.log([trainName, destination, traintime, frequency]);
 
-            //get number of months from start date. below are the ones that need the info calculated for us.
-            // var totalMonths = moment().diff(moment(startDate), "months");
-            // var totalBilled = parseInt(MonthlyRate) * parseInt(rate);
-
-
-            //pushing the data up to firebox.  ASK ABOUT THIS PART.
+            //pushing the data up to firebase. 
             database.ref().push({
                 trainName: trainName,
                 destination: destination,
                 traintime: traintime,
                 frequency: frequency,
 
-                //dateAdded is from firebox, its a pre set thing it does. 
+                //dateAdded is from firebase, its a pre set thing it does. 
                 dateAdded: firebase.database.ServerValue.TIMESTAMP
-
             });
 
-            //treat child added as its 1 thing at a time, not a loop.  returns one at a time, but multiple times. the callback function only needs to be done for 1 child, and the rest will do it. 
-
-            // database.ref().orderByChild("dateAdded").on("child_added", function (snapshot) {
-            //     var sb = snapshot.val();
-            //     console.log(sb);
-            //     // Console.log(sb.startDate);
-            //     // console.log(sb.monthsWorked);
-            //     // console.log(sb.monthlyRate);
-            //     // console.log(sb.totalBilled);
-            //     // console.log(snapshot);
-            // });
-
-
+            //pull from firebase, add a row and fill it with the info
             database.ref().on("child_added", function (snapshot) {
-                $("#tableinput").find('tbody').empty();
                 createRow(snapshot);
             });
-
 
         });
 
         var createRow = function(snapshot) {
-            console.log("Another Firebase Entry--");
+            console.log("createRow(snapshot)--");
             // Log everything that's coming out of snapshot
             console.log(snapshot.val());
 
-            // To calculate the next arrival
-            // var nextArrival = moment().diff(moment.unix(snapshot.child('traintime').val(), ","), "traintime");
-            console.log("Calculate nextArrival--");
+
+            // To calculate the next arrival          
+            //telling moment.js that data will look like HH:mm
             var startTime = moment(snapshot.child('traintime').val(),"HH:mm");
             var frequency = snapshot.child('frequency').val();
-            var nextArrival = "";
+            //
+            var nextArrival = startTime;
             while(nextArrival < moment()){
-                nextArrival = startTime.add(frequency, 'minutes'); 
+                nextArrival = nextArrival.add(frequency, 'minutes'); 
+                // console.log(nextArrival)
             }
 
-            // var nextArrival = moment(snapshot.child('traintime').val(),"HH:mm");
-            // var varName = moment('13:45','HH:mm')
             var diffArrival = nextArrival.fromNow();
-            console.log("Next Arrival: "+nextArrival);
-            console.log("Diff Arrival: "+diffArrival);
 
-            // Calculate the minutes away
-            // var minutesAway = trnTime * minutesAway;
-            // console.log(trnTime);
-
-                //create the reference to create a table based on the table role. for each piece of data.
+            //create the reference to create a table based on the table role. for each piece of data.
             var tr = $("<tr>");
             var tdName = $("<td>").text(snapshot.child('trainName').val());
             var tdDestination = $("<td>").text(snapshot.child('destination').val());
@@ -203,18 +165,14 @@
             var tdNextArrival = $("<td>").text(nextArrival.format("h:mm a"));
             var tdDiffArrival = $("<td>").text(diffArrival);
 
-            //add in the appen do fht einfo like an array. add in all form areas. tables have to have matching table accounts.  leave areas blank if you need to. 
+            //add in the appen do the info like an array. add in all form areas. tables have to have matching table accounts.  leave areas blank if you need to. 
             tr.append(tdName, tdDestination, tdFrequency, tdNextArrival, tdDiffArrival);
 
             $("#tableinput").find('tbody').append(tr);
-            //playing with time.. not for this excerise above.
         };
 
-
-
     </script>
-
-
+ 
 </body>
 
 </html>
